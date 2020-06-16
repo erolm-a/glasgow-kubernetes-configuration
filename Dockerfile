@@ -22,11 +22,15 @@ MAINTAINER Enrico Trombetta <trombetta.enricom@protonmail.com>
 USER root
 
 # Install essentials
+
+ENV DEBIAN_FRONTEND=noninteractive
+
 RUN apt-get update && apt-get install -y \
 software-properties-common \
 wget \
 make \
 gcc \
+curl \
 git
 
 # Install java 8
@@ -41,14 +45,14 @@ RUN apt-get update && apt-get install scala -y
 # Install python
 RUN apt-get update && apt-get install -y python3 \
 python3-pip \
-python-setuptools \
-python-pip
+python-setuptools
+
+
 RUN pip3 install \
 numpy \
 pandas \
 jupyter \
 jupyterlab \
-py4j \
 cbor \
 transformers \
 nltk \
