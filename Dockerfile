@@ -15,7 +15,8 @@
 
 # Abridged from ainmackie/trec-car-entity-processing
 
-FROM ubuntu:latest
+# By default, Ubuntu 19.10 uses Python3.7 which is required for pyspark
+FROM ubuntu:19.10
 
 MAINTAINER Enrico Trombetta <trombetta.enricom@protonmail.com>
 
@@ -59,6 +60,7 @@ nltk \
 torch \
 pyarrow \
 protobuf \
+py4j \
 pystream-protobuf==1.5.1
 
 # Install Spark
