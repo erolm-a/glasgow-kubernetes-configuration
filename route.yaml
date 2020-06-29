@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Route
+metadata:
+  name: jupyterroute
+  namespace: jeffstudentsproject
+spec:
+  path: /
+  to:
+    kind: Service
+    name: jupyterservice
+  port:
+    targetPort: 8888

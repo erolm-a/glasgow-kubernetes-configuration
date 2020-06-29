@@ -61,7 +61,11 @@ torch \
 pyarrow \
 protobuf \
 py4j \
-pystream-protobuf==1.5.1
+pystream-protobuf==1.5.1 \
+spylon-kernel
+
+# Install Jupyter Scala support
+RUN python3 -m spylon_kernel install
 
 # Install Spark
 ENV APACHE_SPARK_VERSION=2.4.5 \

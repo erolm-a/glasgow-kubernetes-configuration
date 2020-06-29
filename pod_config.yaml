@@ -1,0 +1,46 @@
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  name: pythonmlnotebookgpu2-enricot
+  namespace: jeffstudentsproject
+spec:
+  replicas: 1
+  strategy:
+    resources: {}
+  template:
+    metadata:
+      labels:
+        app: pythonMLNotebook
+        deploymentconfig: pythonMLNotebookGPU
+    spec:
+      containers:
+      - name: deepo-ml-plus-enricot
+        image: iainmackie/trec-car-entity-processing:v13
+        resources:
+          requests:
+            cpu: "12000m"
+            memory: "32Gi"
+          limits:
+            cpu: "32000m"
+            memory: "128Gi"
+        command:
+          - 'jupyter-lab'
+        args:
+          - '--no-browser'
+          - '--ip=0.0.0.0'
+          - '--allow-root'
+          - '--NotebookApp.token='
+          - '--notebook-dir="/nfs/"'
+        ports:
+          - containerPort: 8888
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+          - mountPath: /nfs/
+            name: nfs-access
+      securityContext: {}
+      serviceAccount: containerroot
+      volumes:
+      - name: nfs-access
+        persistentVolumeClaim:
+          claimName: jeffstudentsvol1claim
+
