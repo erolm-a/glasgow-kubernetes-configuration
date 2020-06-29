@@ -1,0 +1,42 @@
+---
+apiVersion: "apps/v1"
+kind: "Deployment"
+metadata:
+  name: "knowledge-glue-pyspark-notebook"
+  namespace: "default"
+  labels:
+    app: "knowledge-glue-pyspark-notebook"
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: "knowledge-glue-pyspark-notebook"
+  template:
+    metadata:
+      labels:
+        app: "knowledge-glue-pyspark-notebook"
+    spec:
+      containers:
+      - name: "pyspark-notebook-1"
+        image: "jupyter/pyspark-notebook"
+---
+apiVersion: "autoscaling/v2beta1"
+kind: "HorizontalPodAutoscaler"
+metadata:
+  name: "knowledge-glue-pyspark-notebook-hpa-yc7p"
+  namespace: "default"
+  labels:
+    app: "knowledge-glue-pyspark-notebook"
+spec:
+  scaleTargetRef:
+    kind: "Deployment"
+    name: "knowledge-glue-pyspark-notebook"
+    apiVersion: "apps/v1"
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+  - type: "Resource"
+    resource:
+      name: "cpu"
+      targetAverageUtilization: 80
+
