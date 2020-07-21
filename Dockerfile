@@ -43,6 +43,14 @@ ENV PATH="$JAVA_HOME/bin:$PATH"
 # Install scala
 RUN apt-get update && apt-get install scala -y
 
+# ...and sbt
+RUN echo "deb https://dl.bintray.com/sbt/debian /" > /etc/apt/sources.list.d/sbt.list
+RUN curl -sL "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x2EE0EA64E40A89B84B2DF73499E82A75642AC823" | apt-key add
+RUN apt-get update && apt-get install -y sbt
+
+# Install lightcopy parquet-index
+RUN cd /tmp && git clone https://github.com/erolm-a/parquet-index && cd parquet-index && sbt package && cp /tmp/parquet-index/target/scala-2.11/parquet-index_2.11-0.4.1-SNAPSHOT.jar /lib
+
 # Install python
 RUN apt-get update && apt-get install -y python3 \
 python3-pip \
@@ -78,41 +86,11 @@ tar xzf spark-${APACHE_SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}.tgz -C /usr/lo
 rm spark-${APACHE_SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}.tgz
 ENV SPARK_HOME=/usr/local/share/spark-${APACHE_SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}
 ENV PYTHONPATH=$SPARK_HOME/python:$SPARK_HOME/python/lib/py4j-0.10.7-src.zip
-ENV SPARK_OPTS="--driver-java-options=-Xms1024M --driver-java-options=-Xmx4096M --driver-java-options=-Dlog4j.logLevel=info"
+ENV SPARK_OPTS="--driver-java-options=-Xms1024M --driver-java-options=-Xmx12288M --driver-java-options=-Dlog4j.logLevel=info"
 ENV PATH=$PATH:$SPARK_HOME/bin
 ENV PYSPARK_PYTHON=python3
 
 
-# Install Jena - abridged from stain/jena
-
-# Update below according to https://jena.apache.org/download/ 
-# and checksum for apache-jena-3.x.x.tar.gz.sha512
-ENV JENA_SHA512 ba2e966df3ff2c8727b02f95771aa9f9953687fadbd51a95fff3709bb342ca64c1ac54bc25c9e24432b038c14737979c48fad5885e5841d6c15cc4967859b037
-ENV JENA_VERSION 3.14.0
-
-# No need for https due to sha512 checksums below
-ENV ASF_MIRROR http://www.apache.org/dyn/mirrors/mirrors.cgi?action=download&filename=
-ENV ASF_ARCHIVE http://archive.apache.org/dist/
-WORKDIR /tmp
-# sha512 checksum
-RUN echo "$JENA_SHA512  jena.tar.gz" > jena.tar.gz.sha512
-# Download/check/unpack/move in one go (to reduce image size)
-RUN     (curl --location --silent --show-error --fail --retry-connrefused --retry 3 --output jena.tar.gz ${ASF_MIRROR}jena/binaries/apache-jena-$JENA_VERSION.tar.gz || \
-         curl --fail --silent --show-error --retry-connrefused --retry 3 --output jena.tar.gz $ASF_ARCHIVE/jena/binaries/apache-jena-$JENA_VERSION.tar.gz) && \
-	sha512sum -c jena.tar.gz.sha512 && \
-	tar zxf jena.tar.gz && \
-	mv apache-jena* /jena && \
-	rm jena.tar.gz* && \
-	cd /jena && rm -rf *javadoc* *src* bat
-
-# Add to PATH
-ENV PATH $PATH:/jena/bin
-# Check it works
-RUN riot  --version
-
-# Default dir /rdf, can be used with
-# --volume
-RUN mkdir /rdf
-WORKDIR /rdf
-#VOLUME /rdf
-CMD ["/jena/bin/riot"]
+RUN mkdir /nfs
+WORKDIR /nfs
+CMD ["/bin/bash"]
