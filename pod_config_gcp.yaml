@@ -5,7 +5,7 @@ metadata:
   labels:
     app: knowledge-glue-pyspark-notebook
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app: knowledge-glue-pyspark-notebook

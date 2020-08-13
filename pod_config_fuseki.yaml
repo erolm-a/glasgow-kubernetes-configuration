@@ -7,23 +7,22 @@ metadata:
   namespace: jeffstudentsproject
 spec:
   containers:
-    - name: spark-jena-jupyter
-      image: erolmatei/spark-jena-jupyter:0.2
+    - name: fuseki
+      image: stain/jena-fuseki:3.14.0
       ports:
-        - containerPort: 8888
+        - containerPort: 3030
       resources:
         cpu: "12000m"
         memory: "16Gi"
       command:
-        - 'jupyter-lab'
-      args:
-        - '--no-browser'
-        - '--ip=0.0.0.0'
-        - '--allow-root'
-        - '--NotebookApp.token='
-        - '--notebook-dir=/nfs'
+        - /jena-fuseki/fuseki-server
+      env:
+        - name: ADMIN_PASSWORD
+          value: secret_password_here
+        - name: JVM_ARGS
+          value: -Xmx12G
       volumeMounts:
-        - mountPath: /nfs/
+        - mountPath: /fuseki
           name: nfs-access
   securityContext: {}
   serviceAccount: containerroot

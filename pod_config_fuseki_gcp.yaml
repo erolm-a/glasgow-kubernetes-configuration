@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: knowledge-glue
+  labels:
+    app: grill-lab-fuseki
+spec:
+  containers:
+    - name: fuseki
+      image: stain/jena-fuseki:3.14.0
+      ports:
+        - containerPort: 3030
+      resources:
+        requests:
+          cpu: "2"
+          memory: "8Gi"
+        limits:
+          cpu: "4"
+          memory: "20Gi"
+      command:
+        - /jena-fuseki/fuseki-server
+      env:
+        - name: ADMIN_PASSWORD
+          value: secret_password_here
+        - name: JVM_ARGS
+          value: -Xmx12G
+      volumeMounts:
+        - mountPath: /fuseki
+          name: fuseki-pv
+  securityContext: {}
+  serviceAccount: containerroot
+  volumes:
+    - name: fuseki-pv
+      persistentVolumeClaim:
+        claimName: fuseki-pv-claim
+          
+

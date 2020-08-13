@@ -1,27 +1,24 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: knowledge-glue
+  name: knowledge-glue-webserver
   labels:
-    app: pythonMLNotebook
+    app: webui
   namespace: jeffstudentsproject
 spec:
   containers:
     - name: spark-jena-jupyter
       image: erolmatei/spark-jena-jupyter:0.2
       ports:
-        - containerPort: 8888
+        - containerPort: 80
+        - containerPort: 8080
       resources:
         cpu: "12000m"
         memory: "16Gi"
       command:
-        - 'jupyter-lab'
+        - 'sleep'
       args:
-        - '--no-browser'
-        - '--ip=0.0.0.0'
-        - '--allow-root'
-        - '--NotebookApp.token='
-        - '--notebook-dir=/nfs'
+        - '365d' # thank you Carlos :)
       volumeMounts:
         - mountPath: /nfs/
           name: nfs-access
@@ -31,5 +28,4 @@ spec:
     - name: nfs-access
       persistentVolumeClaim:
         claimName: jeffstudentsvol1claim
-          
 
